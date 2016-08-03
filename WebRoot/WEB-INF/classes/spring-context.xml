@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+				http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+				http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.5.xsd
+				http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd"
+	default-autowire="byName">
+
+	<context:component-scan base-package="com.suncreate.codergen" />
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+
+	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+	<!-- (in this case, JDBC-related settings for the dataSource definition below) -->
+	<context:property-placeholder location="classpath:config.properties,classpath:config-jdbc.properties"/>
+	<import resource="classpath:spring-template.xml" />
+
+	<!--
+		Uses Apache Commons DBCP for connection pooling. See Commons DBCP documentation
+		for the required JAR files. Alternatively you can use another connection pool
+		such as C3P0, similarly configured using Spring.
+	-->
+	<!--
+		<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+			p:driverClassName="${jdbc.driverClassName}" p:url="${jdbc.url}" p:username="${jdbc.username}"
+			p:password="${jdbc.password}"/>
+	-->
+			
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">          
+	    <property name="driverClassName" value="${jdbc.driverClassName}" />
+	    <property name="url" value="${jdbc.url}" />
+	    <property name="username" value="${jdbc.username}" />
+	    <property name="password" value="${jdbc.password}" />
+	</bean>
+	
+	<bean id="config" class="com.suncreate.codergen.internal.config.Configuration" init-method="init">
+	    <property name="workspace" value="${config.workspace}" />
+	    <property name="package_prefix" value="${config.package.prefix}" />
+	    <property name="package_prefix_commons" value="${config.package.prefix.commons}" />
+	    <property name="table_names" value="${config.table.names}" />
+	    <property name="workspace_zip" value="${config.workspace.zip}" />
+	    <property name="name" value="${config.name}" />
+	</bean>
+		
+	<bean id="internal" class="com.suncreate.codergen.utils.Messages" destroy-method="destroy" init-method="init">
+		<property name="bundle_name" value="messages" />
+	</bean>
+		
+</beans>
